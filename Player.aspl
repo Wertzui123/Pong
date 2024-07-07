@@ -1,0 +1,82 @@
+import math.geometry
+import graphics
+
+class Player {
+    
+    [readpublic]
+    property Point position
+    [public]
+    property int score = 0
+    [readpublic]
+    property bool ai
+    [readpublic]
+    property int aiPower
+
+    [public]
+    property Rectangle rectangle{
+        get{
+            var size = 160f
+            return new Rectangle(new Point(position.x - size / 2 / 2, position.y - size / 2), new Size(size / 2, size))
+        }
+    }
+
+    method construct(bool ai = false, int aiPower = 10) {
+        this.ai = ai
+        this.aiPower = aiPower
+    }
+
+    [public]
+    method init(Game game){
+        reset(game)
+    }
+
+    [public]
+    method tick(Game game){
+        if(ai){
+            if(game.ball.position.x < game.width / 2){
+                if(game.one == this){
+                    if(game.ball.position.y > position.y){
+                        position = new Point(position.x, position.y + float(math.min(double(game.ball.position.y - position.y), double(aiPower))))
+                    }
+                    elseif(game.ball.position.y < position.y){
+                        position = new Point(position.x, position.y - float(math.min(double(position.y - game.ball.position.y), double(aiPower))))
+                    }
+                }
+            }else{
+                if(game.two == this){
+                    if(game.ball.position.y > position.y){
+                        position = new Point(position.x, position.y + float(math.min(double(game.ball.position.y - position.y), double(aiPower))))
+                    }
+                    elseif(game.ball.position.y < position.y){
+                        position = new Point(position.x, position.y - float(math.min(double(position.y - game.ball.position.y), double(aiPower))))
+                    }
+                }
+            }
+        }
+    }
+
+    [public]
+    method draw(Canvas canvas){
+        canvas.fillRectangle(rectangle, new Color(255b, 255b, 255b, 255b))
+    }
+
+    [public]
+    method up(){
+        position = new Point(position.x, position.y - 10)
+    }
+
+    [public]
+    method down(){
+        position = new Point(position.x, position.y + 10)
+    }
+
+    [public]
+    method reset(Game game){
+        if(game.one == this){
+            this.position = new Point(game.width / 20f, game.height / 2f)
+        }else{
+            this.position = new Point(game.width - game.width / 20f, game.height / 2f)
+        }
+    }
+
+}

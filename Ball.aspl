@@ -1,0 +1,68 @@
+import math
+import math.geometry
+import graphics
+import rand
+
+class Ball {
+    
+    [readpublic]
+    property Point position
+    [public]
+    property Point velocity
+
+    property bool alreadyInOne = false
+    property bool alreadyInTwo = false
+
+    property bool rgb
+    property int rgbTick = 0
+    property Color color = new Color(255b, 255b, 255b, 255b)
+
+    method construct(bool rgb = false) {
+        this.rgb = rgb
+    }
+
+    [public]
+    method init(Game game){
+        reset(game)
+    }
+
+    [public]
+    method tick(Game game){
+        this.position = new Point(this.position.x + this.velocity.x, this.position.y + this.velocity.y)
+        if((game.one.rectangle.containsPoint(this.position) && !alreadyInOne) || (game.two.rectangle.containsPoint(this.position) && !alreadyInTwo)){
+            this.velocity = new Point(-this.velocity.x, this.velocity.y)
+        }
+        alreadyInOne = game.one.rectangle.containsPoint(this.position)
+        alreadyInTwo = game.two.rectangle.containsPoint(this.position)
+    }
+
+    [public]
+    method draw(Canvas canvas){
+        if(rgb){
+            if(rgbTick % 10 == 0){
+                color = new Color(255b, rand.brange(0b, 255b), rand.brange(0b, 255b), rand.brange(0b, 255b))
+            }
+            rgbTick++
+        }
+        canvas.fillCircle(new Ellipse(position, new Size(25f, 25f)), color)
+    }
+
+    method pickRandomVelocity(Game? game = null){
+        // TODO: The ball should not fly out of the field top or bottom
+        var scoreSpeed = 0f
+        if(game != null){
+            scoreSpeed = float(math.max((game?!.one.score + game?!.two.score) / 10d, 5d))
+        }
+        var float speed = 15f + scoreSpeed
+        var double theta = rand.drange(0d, 2d * math.pi())
+        var float y = rand.float()
+        this.velocity = new Point(float(math.sin(theta) * speed), float(math.cos(theta) * speed))
+    }
+
+    [public]
+    method reset(Game game){
+        this.position = new Point(game.width / 2f, game.height / 2f)
+        pickRandomVelocity(game)
+    }
+
+}

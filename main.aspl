@@ -1,0 +1,111 @@
+import graphics
+import math.geometry
+
+var Window window = new Window(500, 500)
+var Game game = new Game(window, new Ball(false), new Player(), new Player(true, 14))
+window.onLoad = callback(){
+    game.resize(window.width, window.height)
+}
+var bool paused = false
+var bool holdingUp = false
+var bool holdingDown = false
+window.onPaint = callback(Canvas canvas){
+    if(canvas.width != game.width || canvas.height != game.height){
+        game.resize(canvas.width, canvas.height)
+    }
+    
+	canvas.fill(new Color(255b, 0b, 0b, 0b), false)
+    if(!paused){
+        game.tick()
+    }
+    game.draw(canvas)
+
+    if(!paused){
+        if(holdingUp){
+            if(!game.one.ai){
+                game.one.up()
+            }
+            if(!game.two.ai){
+                game.two.up()
+            }
+        }
+        if(holdingDown){
+            if(!game.one.ai){
+                game.one.down()
+            }
+            if(!game.two.ai){
+                game.two.down()
+            }
+        }
+    }
+}
+window.onKeyDown = callback(KeyCode key){
+    if(key == KeyCode.up){
+        holdingUp = true
+    }elseif(key == KeyCode.down){
+        holdingDown = true
+    }
+}
+window.onKeyUp = callback(KeyCode key){
+    if(key == KeyCode.up){
+        holdingUp = false
+    }elseif(key == KeyCode.down){
+        holdingDown = false
+    }elseif(key == KeyCode.space){
+        paused = !paused
+    }elseif(key == KeyCode.n){
+        game.ball.reset(game)
+        game.one.reset(game)
+        game.two.reset(game)
+    }elseif(key == KeyCode.r){
+        game.one.score = 0
+        game.two.score = 0
+        game.ball.reset(game)
+        game.one.reset(game)
+        game.two.reset(game)
+    }elseif(key == KeyCode.f){
+        window.toggleFullscreen()
+    }
+}
+var touchesDown = list<long>[]
+window.onTouchDown = callback(list<TouchPoint> points){
+    foreach(points as point){
+        if(point.changed){
+            touchesDown.add(point.identifier)
+        }
+    }
+}
+window.onTouchUp = callback(list<TouchPoint> points){
+    foreach(points as point){
+        if(point.changed){
+            touchesDown.remove(point.identifier)
+        }
+    }
+    if(touchesDown.length == 0){
+        holdingUp = false
+        holdingDown = false
+    }
+}
+window.onTouchMove = callback(list<TouchPoint> points){
+    foreach(points as point){
+        if(point.changed){
+            if(point.position.x < game.width / 2){
+                if(point.position.y < game.height / 2){
+                    holdingUp = true
+                }else{
+                    holdingDown = true
+                }
+            }else{
+                if(point.position.y < game.height / 2){
+                    holdingUp = true
+                }else{
+                    holdingDown = true
+                }
+            }
+        }
+    }
+}
+window.onResize = callback(int width, int height){
+    game.resize(width, height)
+}
+window.show()

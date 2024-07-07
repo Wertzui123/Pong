@@ -1,0 +1,73 @@
+import graphics
+import math.geometry
+
+class Game {
+    
+    [readpublic]
+    property Ball ball
+    [readpublic]
+    property Player one
+    [readpublic]
+    property Player two
+
+    [readpublic]
+    property int width
+    [readpublic]
+    property int height
+
+    method construct(Window window, Ball ball, Player one, Player two) {
+        this.ball = ball
+        this.one = one
+        this.two = two
+
+        this.width = window.width
+        this.height = window.height
+
+        ball.init(this)
+        one.init(this)
+        two.init(this)
+    }
+
+    [public]
+    method tick(){
+        ball.tick(this)
+        one.tick(this)
+        two.tick(this)
+
+        if(ball.position.x < 0){
+            two.score++
+            ball.reset(this)
+            one.reset(this)
+            two.reset(this)
+        }elseif(ball.position.x > this.width){
+            one.score++
+            ball.reset(this)
+            one.reset(this)
+            two.reset(this)
+        }elseif(ball.position.y < 0){
+            ball.velocity = new Point(ball.velocity.x, -ball.velocity.y)
+        }elseif(ball.position.y > this.height){
+            ball.velocity = new Point(ball.velocity.x, -ball.velocity.y)
+        }
+    }
+
+    [public]
+    method draw(Canvas canvas){
+        ball.draw(canvas)
+        one.draw(canvas)
+        two.draw(canvas)
+
+        canvas.drawText("Score: " + one.score, 20, 20, Font:default.withSize(50), new Color(255b, 255b, 255b, 255b), HorizontalAlignment.Left, VerticalAlignment.Top)
+        canvas.drawText("Score: " + two.score, this.width - 20, 20, Font:default.withSize(50), new Color(255b, 255b, 255b, 255b), HorizontalAlignment.Right, VerticalAlignment.Top)
+    }
+
+    [public]
+    method resize(int width, int height){
+        this.width = width
+        this.height = height
+        ball.reset(this)
+        one.reset(this)
+        two.reset(this)
+    }
+
+}
